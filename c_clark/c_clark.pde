@@ -1,7 +1,6 @@
 import controlP5.*;
 
 MeshBuilder mshB = new MeshBuilder();
-float xRotation, yRotation;
 Mesh mesh;
 
 ArrayList<Point> baryCentersPoints;
@@ -9,6 +8,9 @@ ArrayList<Point> edgePoints;
 ArrayList<Point> facePoints;
 
 Boolean details;
+Boolean lineDisplay;
+float xRotation, yRotation;
+float scaleShape;
 
 ControlP5 cp5;
 Button showPoints;
@@ -16,16 +18,16 @@ Button subdivade;
 Button pentagone;
 Button cube;
 Button polgonalShape;
+Button display;
+
+ColorPicker colorPicker;
 
 Slider scaleSlider;
 
-float scaleShape;
-int myColor = color(255);
 
 void setup(){
   size(1700, 950, P3D);
   
-  mesh = mshB.getPolygonalShape();
   xRotation=0;
   yRotation=0;
   
@@ -33,11 +35,13 @@ void setup(){
   edgePoints = new ArrayList();
   facePoints = new ArrayList();
   
-  cp5 = new ControlP5(this);
-  
   details = true;
+  lineDisplay = false;
   scaleShape = 100;
-     
+  
+  mesh = mshB.getCube();
+  cp5 = new ControlP5(this);
+    
   showPoints = cp5.addButton("showPoints")
      .setValue(0)
      .setLabel("details")
@@ -75,7 +79,16 @@ void setup(){
    polgonalShape = cp5.addButton("polgonalShape")
      .setLabel("polgonal Shape")
      .setPosition(100,300)
+     .setSize(200,30);
+     
+   display = cp5.addButton("display")
+     .setLabel("changer l'affichage")
+     .setPosition(width - 300, height - 300)
      .setSize(200,30); 
+     
+  colorPicker = cp5.addColorPicker("picker")
+                .setPosition(100, 100)
+                .setColorValue(color(255, 0, 0));
      
 }
 
@@ -89,20 +102,16 @@ void draw(){
   }
   yRotation +=0.01;
   rotateY(yRotation);
+  
   scale(scaleShape/100);
   
- for(Face face : mesh.getFaces()){     
-     for(Edge edge : face.getEdges()){
-        stroke(0, 0, 0);
-        strokeWeight(5);
-        beginShape(LINES);
-        Point pointA = edge.getA();
-        Point pointB = edge.getB();
-        vertex(pointA.getX(), pointA.getY(), pointA.getZ());
-        vertex(pointB.getX(), pointB.getY(), pointB.getZ());
-        endShape();  
-     }
-  }   
+  if(lineDisplay){
+    drawWithLines();
+  }
+  else{
+    drawWithSurface();
+  }
+    
   if(details){
     for(Point point : facePoints){
       stroke(255,0,0);
@@ -139,6 +148,48 @@ void draw(){
   scaleSlider.bringToFront();
 }
 
+public void drawWithLines(){
+  for(Face face : mesh.getFaces()){ 
+     for(Edge edge : face.getEdges()){
+       stroke(0, 0, 0);
+       strokeWeight(5);
+        Point pointA = edge.getA();
+        Point pointB = edge.getB();
+        beginShape(LINES);
+        vertex(pointA.getX(), pointA.getY(), pointA.getZ());
+        vertex(pointB.getX(), pointB.getY(), pointB.getZ());
+        endShape();
+     }
+     
+  }
+}
+
+public void drawWithSurface(){
+  for(Face face : mesh.getFaces()){ 
+    stroke(0, 0, 0);
+    fill(120);
+    strokeWeight(5);
+    beginShape();
+    
+     for(Edge edge : face.getEdges()){   
+        Point pointA = edge.getA();
+        Point pointB = edge.getB();
+        vertex(pointA.getX(), pointA.getY(), pointA.getZ());
+        vertex(pointB.getX(), pointB.getY(), pointB.getZ());
+          
+     }
+     endShape();
+  }
+}
+
+public void display(){
+  if(lineDisplay){
+    lineDisplay = false;
+  }else{
+    lineDisplay = true;
+  }
+}
+
 public void showPoints() {
   details = !details;
 }
@@ -162,7 +213,7 @@ public void scaleSlider(){
 }
 
 public void subdivade(){
-  baryCentersPoints = new ArrayList();
+   baryCentersPoints = new ArrayList();
    edgePoints = new ArrayList();
    facePoints = new ArrayList();
    subdivision(mesh);
