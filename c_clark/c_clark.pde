@@ -151,7 +151,8 @@ void draw(){
 public void drawWithLines(){
   for(Face face : mesh.getFaces()){ 
      for(Edge edge : face.getEdges()){
-       stroke(0, 0, 0);
+       color col = colorPicker.getColorValue();
+       stroke(col);
        strokeWeight(5);
         Point pointA = edge.getA();
         Point pointB = edge.getB();
@@ -167,10 +168,10 @@ public void drawWithLines(){
 public void drawWithSurface(){
   for(Face face : mesh.getFaces()){ 
     stroke(0, 0, 0);
-    fill(120);
+    color col = colorPicker.getColorValue();
+    fill(col);
     strokeWeight(5);
     beginShape();
-    
      for(Edge edge : face.getEdges()){   
         Point pointA = edge.getA();
         Point pointB = edge.getB();
@@ -183,11 +184,7 @@ public void drawWithSurface(){
 }
 
 public void display(){
-  if(lineDisplay){
-    lineDisplay = false;
-  }else{
-    lineDisplay = true;
-  }
+  lineDisplay = !lineDisplay;
 }
 
 public void showPoints() {
